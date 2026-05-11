@@ -679,8 +679,8 @@
                 const t = this.ctx.currentTime;
                 const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
                 o.frequency.setValueAtTime(200, t); o.frequency.linearRampToValueAtTime(1200, t+0.1);
-                g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+1.0);
-                o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(t+1.0);
+                g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.7);
+                o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(t+0.7);
             },
             playWin() { 
                 [600, 800, 1200].forEach((f,i) => setTimeout(()=>this.playTone(f,'sine',0.3,0.1), i*100));
@@ -926,7 +926,7 @@
                 const result = isHeads ? 'heads' : 'tails';
                 
                 const startRot = this.coin.rotation.x;
-                const spins = 10; 
+                const spins = 6; 
                 let spinAngle = Math.PI * 2 * spins;
                 
                 if (this.lastResult !== result) {
@@ -937,7 +937,7 @@
                 this.lastResult = result;
 
                 let progress = 0;
-                const dur = 80; 
+                const dur = 40; 
                 
                 AudioSys.playFlip();
 
