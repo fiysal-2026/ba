@@ -165,6 +165,8 @@
             transition: all 0.2s;
         }
         .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-btn.ad-btn { background: rgba(255, 215, 0, 0.1); color: var(--primary); border-color: rgba(255, 215, 0, 0.2); }
+        .nav-btn.ad-btn:hover { background: rgba(255, 215, 0, 0.2); }
 
         .wallet-display {
             background: rgba(0,0,0,0.3);
@@ -455,7 +457,7 @@
 
             /* Adjustments for Footer */
             .sidebar {
-                bottom: 50px;
+                bottom: 70px;
                 height: 50vh;
             }
         }
@@ -464,14 +466,14 @@
         .footer-bar {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
-            height: 50px;
+            height: 70px;
             background: var(--nav-bg);
             border-top: 1px solid var(--border);
             backdrop-filter: var(--glass);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 15px;
             z-index: 100;
         }
 
@@ -479,14 +481,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 4px;
             color: var(--text-dim);
             cursor: pointer;
             transition: all 0.2s;
-            flex: 1;
         }
 
-        .footer-item i { font-size: 1.25rem; }
+        .footer-item i { font-size: 1.4rem; }
         .footer-item span { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .footer-item:hover, .footer-item.active { color: #fff; }
@@ -533,6 +534,13 @@
                 <i class="ph-fill ph-wallet"></i>
                 <span id="wallet-balance">1000.00</span>
             </div>
+            <button class="nav-btn ad-btn" onclick="UI.openAd()">
+                <i class="ph-fill ph-video"></i>
+                <span>Get $100</span>
+            </button>
+            <button class="nav-btn" onclick="UI.openHelp()">
+                <i class="ph-bold ph-question"></i>
+            </button>
         </div>
     </nav>
 
@@ -607,6 +615,19 @@
         </div>
     </div>
 
+    <!-- MODAL: AD -->
+    <div class="modal-overlay" id="modal-ad">
+        <div class="modal-card">
+            <i class="ph-duotone ph-television-simple modal-icon" style="color: #00f3ff;"></i>
+            <h2 class="modal-title">Watching Ad...</h2>
+            <div id="ad-content" style="background:#000; height:150px; margin-bottom:20px; display:flex; align-items:center; justify-content:center; border-radius:8px; border:1px dashed #333;">
+                <span id="ad-timer" style="font-size:2rem; font-family:'Rajdhani'; color:#fff;">10</span>
+            </div>
+            <p class="modal-text">Please wait to claim your free credits.</p>
+            <button class="btn-close" id="btn-cancel-ad" onclick="UI.closeModal('modal-ad')">Close</button>
+            <button class="btn-claim" id="btn-claim-ad" onclick="UI.claimAdReward()">Claim +100 Coins</button>
+        </div>
+    </div>
 
     <!-- FOOTER NAV BAR -->
     <footer class="footer-bar">
@@ -672,7 +693,39 @@
         // --- UI MANAGER ---
         const UI = {
             openHelp() { document.getElementById('modal-help').classList.add('open'); },
-            closeModal(id) { document.getElementById(id).classList.remove('open'); }
+            openAd() { 
+                document.getElementById('modal-ad').classList.add('open'); 
+                this.startAdTimer();
+            },
+            closeModal(id) { document.getElementById(id).classList.remove('open'); },
+            
+            startAdTimer() {
+                const timerEl = document.getElementById('ad-timer');
+                const btnClaim = document.getElementById('btn-claim-ad');
+                const btnCancel = document.getElementById('btn-cancel-ad');
+                
+                btnClaim.style.display = 'none';
+                btnCancel.style.display = 'inline-block';
+                let timeLeft = 10;
+                timerEl.textContent = timeLeft;
+                
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = timeLeft;
+                    if(timeLeft <= 0) {
+                        clearInterval(interval);
+                        timerEl.textContent = "DONE";
+                        btnCancel.style.display = 'none';
+                        btnClaim.style.display = 'inline-block';
+                        AudioSys.playWin();
+                    }
+                }, 1000);
+            },
+
+            claimAdReward() {
+                game.updateBalance(100);
+                this.closeModal('modal-ad');
+            }
         };
 
         // --- GAME LOGIC ---
